@@ -26,7 +26,27 @@ public class Keys
         }
         else
         {
-            throw new Exception("El tipo de seguridad introducido no es válido.");
+            throw new Exception("El tipo de cifrado introducido no es válido.");
+        }
+    }
+
+    public static byte[] descifrar(String tipo, byte[] textoCifrado, String path) throws Exception
+    {
+        if (tipo.equals("SIMETRICO"))
+        {
+            SecretKey llave = Simetrico.readKey("./keys/simetricas/"+path, ALGORITMO_SIM);
+            byte [] descifrado = Simetrico.descifrar(llave, textoCifrado);
+            return descifrado;
+        }
+        else if (tipo.equals("ASIMETRICO"))
+        {
+            PrivateKey llave = Asimetrico.readPrivateKey("./keys/asimetricas/"+path);
+            byte [] descifrado = Asimetrico.descifrar(llave, ALGORITMO_ASIM, textoCifrado);
+            return descifrado;
+        }
+        else
+        {
+            throw new Exception("El tipo de cifrado introducido no es válido.");
         }
     }
 
