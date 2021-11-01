@@ -2,26 +2,20 @@ package app.security;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Scanner;
 import javax.crypto.*;
 
 public class Asimetrico 
 {
-
-    private final static String ALGORITMO = "RSA";
-
 
     public static byte[] cifrar(Key llave, String algoritmo, String texto)
     {
@@ -72,28 +66,7 @@ public class Asimetrico
 
     public static void main(String[] args)
     {
-        Scanner in = new Scanner(System.in);
-        String entrada = in.nextLine();
-        in.close();
-
-        KeyPairGenerator generator;
-        try 
-        {
-            generator = KeyPairGenerator.getInstance(ALGORITMO);
-            generator.initialize(1024);
-            KeyPair keyPair = generator.generateKeyPair();
-            PublicKey publicKey = keyPair.getPublic();
-            PrivateKey privateKey = keyPair.getPrivate();
-
-            byte[] textoCifrado = cifrar(publicKey, ALGORITMO, entrada);
-            byte[] textoDescifrado = descifrar(privateKey, ALGORITMO, textoCifrado);
-            System.out.println(new String(textoDescifrado, StandardCharsets.UTF_8));
-        } 
-        catch (NoSuchAlgorithmException e) 
-        {
-            e.printStackTrace();
-        }
-           
+        writeKey("./src/app/security/keys/asimetricas/server/ServerKey");          
     }
 
     public static void writeKey(String output)
@@ -119,13 +92,13 @@ public class Asimetrico
             
             //saving keys in binary format
             
-            String outFile = output+"/llaves";
+            String outFile = output;
             out = new FileOutputStream(outFile + ".key");
             out.write(pvt.getEncoded());
             out.close();
              
             out = new FileOutputStream(outFile + ".pub");
-            out.write(pvt.getEncoded());
+            out.write(pub.getEncoded());
             out.close();
             
             System.err.println("Private key format in which it is created: " + pvt.getFormat());

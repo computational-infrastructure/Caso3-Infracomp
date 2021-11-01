@@ -2,9 +2,7 @@ package app.security;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.spec.KeySpec;
-import java.util.Scanner;
 
 import javax.crypto.*;
 import javax.crypto.spec.DESKeySpec;
@@ -56,20 +54,11 @@ public class Simetrico
     
     public static void main(String[] args)
     {
-        Scanner in = new Scanner(System.in);
-        System.out.println("Ingresa la ruta del archivo con la llave simétrica (Sin el .key): ");
-        String path = in.nextLine();
-        System.out.println("Ingresa el texto a cifrar");
-        String entrada = in.nextLine();
-        System.out.println("El texto introducido fue: " +entrada);
-        in.close();
-        try 
+        try
         {
-            SecretKey llave = readKey(path, "AES");
-            byte[] cifrado = cifrar(llave, entrada);
-            byte[] descifrado = descifrar(llave, cifrado);
-            System.out.println(new String(descifrado, StandardCharsets.UTF_8));
-        } catch (Exception e) 
+            writeKey(128, "./src/app/security/keys/simetricas/server/SymmetricKey", "AES");
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -125,7 +114,7 @@ public class Simetrico
            ky = new SecretKeySpec(kb,algorithm);
         }
   
-        System.out.println();
+        /*System.out.println();
         System.out.println("KeySpec Object Info: ");
         System.out.println("Saved File = "+fl);
         System.out.println("Length = "+kb.length);
@@ -134,7 +123,7 @@ public class Simetrico
         System.out.println();
         System.out.println("SecretKey Object Info: ");
         System.out.println("Algorithm = "+ky.getAlgorithm());
-        System.out.println("toString = "+ky.toString());
+        System.out.println("toString = "+ky.toString())*/
         return ky;
     }
 }
