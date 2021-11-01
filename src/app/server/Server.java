@@ -1,6 +1,7 @@
 package app.server;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -84,9 +85,11 @@ public class Server
         //Inicio del servidor
         try
         {
+            Runtime current = Runtime.getRuntime();
             ServerSocket serversock = new ServerSocket(port);
+            current.addShutdownHook(new Termination(serversock));
             while (true) 
-            {
+            {   
                 Socket socket = serversock.accept();
                 new Thread(new ServidorDelegado(socket)).start();
             }
@@ -137,6 +140,28 @@ public class Server
                 socket.close();
             }
             catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static class Termination extends Thread
+    {
+        private static ServerSocket servSock;
+        public Termination(ServerSocket servSock)
+        {
+            Termination.servSock = servSock;
+        }
+
+        public void run()
+        {
+            try 
+            {
+                System.out.println("Cerrando el ServerSocket");
+                servSock.close();
+            } 
+            catch (IOException e) 
             {
                 e.printStackTrace();
             }
