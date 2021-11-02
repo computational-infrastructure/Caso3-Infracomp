@@ -23,7 +23,6 @@ public class Repeater
     private static PrivateKey llavePrivada;
     private static PublicKey llavePublicaServidor;
     private static String tipo;
-
     public static void main(String[] args)
     {
         if (args.length != 1) 
@@ -70,6 +69,7 @@ public class Repeater
             Runtime current = Runtime.getRuntime();
             ServerSocket serversock = new ServerSocket(port);
             current.addShutdownHook(new Termination(serversock));
+            System.out.println("El Repetidor está corriendo");
             while (true) 
             {   
                 Socket socket = serversock.accept();
@@ -128,11 +128,28 @@ public class Repeater
                 if (serverScanner.nextLine().equals("OK"))
                 {
                     repeaterPrintToServer.println(encryptedIDString);
-                    //TODO Completar los pasos después de que se envía el id encriptado al servidor
+                    String mensajeEncapsulado = serverScanner.nextLine();
+                    byte [] mensajeEncrypted = Keys.str2byte(mensajeEncapsulado);
+                    serverScanner.close();
+                    conexionServer.close();
+                    String mensajeReEncapsulado;
+                    if (tipo.equals("SIMETRICO"))
+                    {
+                        byte [] mensajeDecrypted = Keys.descifrar(tipo, mensajeEncrypted, llaveSimetricaServidor);
+                        String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
+                        byte [] mensajeReEncrypted = Keys.cifrar(tipo, mensajeDecryptedString, llaveSimetricaCliente);
+                        mensajeReEncapsulado = Keys.byte2str(mensajeReEncrypted);   
+                    }
+                    else
+                    {
+                        byte [] mensajeDecrypted = Keys.descifrar(tipo, mensajeEncrypted, llavePrivada);
+                        String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
+                        byte [] mensajeReEncrypted = Keys.cifrar(tipo, mensajeDecryptedString, llavePublicaCliente);
+                        mensajeReEncapsulado = Keys.byte2str(mensajeReEncrypted);  
+                    }
+                    repeaterPrintOut.println(mensajeReEncapsulado);
                 }
-                serverScanner.close();
                 scanner.close();
-                conexionServer.close();
                 socket.close();
             }
             catch (Exception e)

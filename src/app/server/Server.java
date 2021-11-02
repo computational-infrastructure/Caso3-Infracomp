@@ -88,6 +88,7 @@ public class Server
             Runtime current = Runtime.getRuntime();
             ServerSocket serversock = new ServerSocket(port);
             current.addShutdownHook(new Termination(serversock));
+            System.out.println("El Servidor está corriendo");
             while (true) 
             {   
                 Socket socket = serversock.accept();
