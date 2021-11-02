@@ -97,9 +97,9 @@ public class Repeater
                 OutputStream outputToClient = socket.getOutputStream();
                 Scanner scanner = new Scanner(inputToRepeater, "UTF-8");
                 PrintWriter repeaterPrintOut = new PrintWriter(new OutputStreamWriter(outputToClient, "UTF-8"), true);
+                repeaterPrintOut.println("OK");
                 String identificador = scanner.nextLine();
                 int identificadorCliente = Integer.parseInt(identificador);
-                repeaterPrintOut.println("OK");
                 byte[] encryptedID;
                 if (tipo.equals("SIMETRICO"))
                 {
