@@ -86,7 +86,7 @@ public class Repeater
     public static class RepetidorDelegado implements Runnable
     {
         Socket socket;
-        public RepetidorDelegado(Socket s) {s = socket;}
+        public RepetidorDelegado(Socket s) {socket = s;}
         private SecretKey llaveSimetricaCliente;
         private PublicKey llavePublicaCliente;
         public void run()
