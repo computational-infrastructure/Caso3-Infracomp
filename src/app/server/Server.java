@@ -1,7 +1,6 @@
 package app.server;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -15,6 +14,7 @@ import java.util.Scanner;
 import javax.crypto.SecretKey;
 
 import app.security.Keys;
+import app.utils.Termination;
 public class Server 
 {
     private static int port = 1234;
@@ -111,7 +111,6 @@ public class Server
             {
                 InputStream inputToServer = socket.getInputStream();
                 OutputStream outputFromServer = socket.getOutputStream();
-    
                 Scanner scanner = new Scanner(inputToServer, "UTF-8");
                 PrintWriter serverPrintOut = new PrintWriter(new OutputStreamWriter(outputFromServer, "UTF-8"), true);
                 String identificador = scanner.nextLine();
@@ -140,28 +139,6 @@ public class Server
                 socket.close();
             }
             catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static class Termination extends Thread
-    {
-        private static ServerSocket servSock;
-        public Termination(ServerSocket servSock)
-        {
-            Termination.servSock = servSock;
-        }
-
-        public void run()
-        {
-            try 
-            {
-                System.out.println("Cerrando el ServerSocket");
-                servSock.close();
-            } 
-            catch (IOException e) 
             {
                 e.printStackTrace();
             }
