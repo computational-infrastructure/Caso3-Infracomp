@@ -27,11 +27,11 @@ public class Server
     {
         if (args.length != 1) 
         {
-            System.err.println("Usage: java server type");
+            System.err.println("Usage: java Server type");
             System.err.println("Valid types: [SIMETRICO|ASIMETRICO]");
             System.exit(1);
         }
-        else if (args[0].equals("SIMETRICO"))
+        else if (args[0].toUpperCase().equals("SIMETRICO"))
         {
             tipo = "SIMETRICO";
             try
@@ -44,7 +44,7 @@ public class Server
                 System.exit(1);
             }
         }
-        else if (args[0].equals("ASIMETRICO"))
+        else if (args[0].toUpperCase().equals("ASIMETRICO"))
         {
             tipo = "ASIMETRICO";
             try
@@ -113,6 +113,7 @@ public class Server
                 OutputStream outputFromServer = socket.getOutputStream();
                 Scanner scanner = new Scanner(inputToServer, "UTF-8");
                 PrintWriter serverPrintOut = new PrintWriter(new OutputStreamWriter(outputFromServer, "UTF-8"), true);
+                serverPrintOut.println("OK");
                 String identificador = scanner.nextLine();
                 byte[] idArray = Keys.str2byte(identificador);
                 if (tipo.equals("SIMETRICO"))
