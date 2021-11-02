@@ -1,5 +1,6 @@
 package app.repeater;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -155,6 +156,14 @@ public class Repeater
             catch (Exception e)
             {
                 e.printStackTrace();
+                try 
+                {
+                    socket.close();
+                } 
+                catch (IOException e1) 
+                {
+                    e1.printStackTrace();
+                }
             }
         }
     }
