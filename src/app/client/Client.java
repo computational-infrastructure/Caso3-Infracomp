@@ -1,6 +1,5 @@
 package app.client;
 
-public class Client 
-{
-    
+public class Client {
+
 }
