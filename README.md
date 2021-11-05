@@ -5,7 +5,15 @@ Simplified prototype of a client, repeater and server system in which the commun
 ## Usage
 
 1. Open a terminal at root of this project `Caso3-InfraComp/`.
-2. For running server, please use `java -cp ./bin app.server.Server SIMETRICO`.
+2. Run `make communication` for running all the components.
+
+If you want to individually run the components, run the following commands at different terminals:
+
+1. For running server, please use `java -cp ./bin app.server.Server SIMETRICO`.
+2. For running repeater, please use `java -cp ./bin app.server.Repeater SIMETRICO`.
+3. For running client, please use `java -cp ./bin app.client.Client SIMETRICO`.
+
+Remember that you could change `SIMETRICO` to `ASIMETRICO` according to the desired encryption type.
 
 ## License
 
