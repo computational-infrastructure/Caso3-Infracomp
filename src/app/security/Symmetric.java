@@ -44,7 +44,7 @@ public class Symmetric {
 
     public static void main(String[] args) {
         try {
-            writeKey(128, "./src/app/security/keys/simetricas/server/SymmetricKey", "AES");
+            writeKey(128, "./src/app/security/keys/symmetric/server/SymmetricKey", "AES");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -32,7 +32,7 @@ public class Repeater {
         } else if (args[0].toUpperCase().equals("SIMETRICO")) {
             tipo = "SIMETRICO";
             try {
-                llaveSimetricaServidor = Keys.readSecretKey("./src/app/security/keys/simetricas/server/SymmetricKey");
+                llaveSimetricaServidor = Keys.readSecretKey("./src/app/security/keys/symmetric/server/SymmetricKey");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -40,8 +40,8 @@ public class Repeater {
         } else if (args[0].toUpperCase().equals("ASIMETRICO")) {
             tipo = "ASIMETRICO";
             try {
-                llavePrivada = Keys.readPrivateKey("./src/app/security/keys/asimetricas/repeater/RepeaterKey.key");
-                llavePublicaServidor = Keys.readPublicKey("./src/app/security/keys/asimetricas/server/ServerKey.pub");
+                llavePrivada = Keys.readPrivateKey("./src/app/security/keys/asymmetric/repeater/RepeaterKey.key");
+                llavePublicaServidor = Keys.readPublicKey("./src/app/security/keys/asymmetric/server/ServerKey.pub");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -55,7 +55,7 @@ public class Repeater {
             Runtime current = Runtime.getRuntime();
             ServerSocket serversock = new ServerSocket(port);
             current.addShutdownHook(new Termination(serversock));
-            System.out.println("El Repetidor está corriendo");
+            System.out.println("El Repetidor está corriendo...");
             while (true) {
                 Socket socket = serversock.accept();
                 new Thread(new RepetidorDelegado(socket)).start();
@@ -88,7 +88,7 @@ public class Repeater {
                 byte[] encryptedID;
                 if (tipo.equals("SIMETRICO")) {
                     llaveSimetricaCliente = Keys.readSecretKey(
-                            "./src/app/security/keys/simetricas/client/Client" + identificadorCliente + "Key.key");
+                            "./src/app/security/keys/symmetric/client/Client" + identificadorCliente + "Key.key");
                     String idMensajeString = scanner.nextLine();
                     byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
                     byte[] decryptedID = Keys.descifrar(tipo, idMensajeRaw, llaveSimetricaCliente);
@@ -96,7 +96,7 @@ public class Repeater {
                     encryptedID = Keys.cifrar(tipo, idString, llaveSimetricaServidor);
                 } else {
                     llavePublicaCliente = Keys.readPublicKey(
-                            "./src/app/security/keys/asimetricas/client/Client" + identificadorCliente + "Key.pub");
+                            "./src/app/security/keys/asymmetric/client/Client" + identificadorCliente + "Key.pub");
                     String idMensajeString = scanner.nextLine();
                     byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
                     byte[] decryptedID = Keys.descifrar(tipo, idMensajeRaw, llavePrivada);
@@ -108,8 +108,7 @@ public class Repeater {
                 InputStream inputToRepeaterFromServer = conexionServer.getInputStream();
                 OutputStream outputToServer = conexionServer.getOutputStream();
                 Scanner serverScanner = new Scanner(inputToRepeaterFromServer, "UTF-8");
-                PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"),
-                        true);
+                PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"), true);
                 if (serverScanner.nextLine().equals("OK")) {
                     repeaterPrintToServer.println(encryptedIDString);
                     String mensajeEncapsulado = serverScanner.nextLine();

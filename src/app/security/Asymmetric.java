@@ -62,21 +62,20 @@ public class Asymmetric {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             System.out.println("KeyPairGenerator  Object :- " + kpg);
             OutputStream out;
-            // set size of key
+            // Set size of key
             kpg.initialize(1024);
 
-            // generate pair of public and private keys
+            // Generate pair of public and private keys
             KeyPair kp = kpg.generateKeyPair();
 
-            // make public and private keys
+            // Make public and private keys
             Key pub = kp.getPublic();
             Key pvt = kp.getPrivate();
 
             System.out.println("Generated Public key :- " + pub);
             System.out.println("Generated Private key :- " + pvt);
 
-            // saving keys in binary format
-
+            // Saving keys in binary format
             String outFile = output;
             out = new FileOutputStream(outFile + ".key");
             out.write(pvt.getEncoded());
@@ -87,10 +86,10 @@ public class Asymmetric {
             out.close();
 
             System.err.println("Private key format in which it is created: " + pvt.getFormat());
-            // prints "Private key format"
+            // Prints "Private key format"
 
             System.err.println("Public key format in which it is created: " + pub.getFormat());
-            // prints "Public key format"
+            // Prints "Public key format"
 
         } catch (Exception e) {
             e.printStackTrace();

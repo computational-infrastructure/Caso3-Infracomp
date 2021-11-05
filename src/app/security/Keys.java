@@ -31,7 +31,6 @@ public class Keys {
 
     public static byte[] descifrar(String tipo, byte[] textoCifrado, SecretKey llave) throws Exception {
         if (tipo.equals("SIMETRICO")) {
-
             byte[] descifrado = Symmetric.descifrar(llave, textoCifrado);
             return descifrado;
         } else if (tipo.equals("ASIMETRICO")) {
@@ -82,5 +81,4 @@ public class Keys {
     public static PrivateKey readPrivateKey(String filename) throws Exception {
         return Asymmetric.readPrivateKey(filename);
     }
-
 }
