@@ -4,12 +4,12 @@ Simplified prototype of a client, repeater and server system in which the commun
 
 ## Usage
 
-#### Communication
+### Communication prototype running
 
 1. Open a terminal at root of this project `Caso3-InfraComp/`.
 2. Run `make communication` for running all the components.
 
-If you want to individually run the components, run the following commands at different terminals:
+If you want to individually visualize the components, run the following commands at different terminals:
 
 1. For running server, please use `java -cp ./bin app.server.Server type`.
 2. For running repeater, please use `java -cp ./bin app.repeater.Repeater type`.
@@ -19,7 +19,7 @@ If you want to individually run the components, run the following commands at di
 - The clientID is an integer number.
 - The messageID is an integer number between 00 and 09.
 
-#### Key generation
+### Keys generation
 
 When you need to generate a new key, run the following command:
 
