@@ -33,7 +33,7 @@ public class Repeater {
         } else if (args[0].toUpperCase().equals("SIMETRICO")) {
             tipo = "SIMETRICO";
             try {
-                llaveSimetricaServidor = Keys.readSecretKey("./src/app/security/keys/symmetric/server/SymmetricKey");
+                llaveSimetricaServidor = Keys.readSecretKey("./src/app/security/keys/symmetric/server/ServerKey");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);

@@ -41,7 +41,24 @@ public class Symmetric {
 
     public static void main(String[] args) {
         try {
-            writeKey(128, "./src/app/security/keys/symmetric/clients/Client1Key", "AES");
+            String path = "./src/app/security/keys/symmetric/";
+            if (args.length < 1) {
+                System.err.println("Usage: java Symmetric type [id]");
+                System.err.println("Valid types: [client|server|repeater]");
+                System.err.println("Optional: client id");
+                System.exit(1);
+            } else if (args[0].equalsIgnoreCase("client")) {
+                writeKey(128, path + "clients/Client" + args[1] + "Key", "AES");
+            } else if (args[0].equalsIgnoreCase("server")) {
+                writeKey(128, path + "server/ServerKey", "AES");
+            } else if (args[0].equalsIgnoreCase("repeater")) {
+                writeKey(128, path + "repeater/RepeaterKey", "AES");
+            } else {
+                System.err.println("Invalid arguments: " + args);
+                System.err.println("Valid types: [client|server|repeater]");
+                System.err.println("Optional: client id");
+                System.exit(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

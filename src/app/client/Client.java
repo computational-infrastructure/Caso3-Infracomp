@@ -109,7 +109,7 @@ public class Client {
                 byte[] decryptedMessage = Keys.decrypt(messageBytes, llavePrivada);
                 this.messageString = new String(decryptedMessage, StandardCharsets.UTF_8);
             }
-            System.out.println("El Cliente " + clientID + " recibió el mensaje: " + messageString);
+            System.out.println("El Cliente " + clientID + " recibio el mensaje: " + messageString);
             scanner.close();
         }
     }

@@ -4,6 +4,8 @@ Simplified prototype of a client, repeater and server system in which the commun
 
 ## Usage
 
+#### Communication
+
 1. Open a terminal at root of this project `Caso3-InfraComp/`.
 2. Run `make communication` for running all the components.
 
@@ -16,6 +18,16 @@ If you want to individually run the components, run the following commands at di
 - Remember that you could use type `SIMETRICO` or `ASIMETRICO` according to the desired encryption type.
 - The clientID is an integer number.
 - The messageID is an integer number between 00 and 09.
+
+#### Key generation
+
+When you need to generate a new key, run the following command:
+
+For symmetric encryption: `java -cp ./bin app.security.Symmetric type [id]`
+For asymmetric encryption: `java -cp ./bin app.security.Asymmetric type [id]`
+
+- The valid types are `client`, `repeater` or `server`.
+- The `id` is an integer number and is only applicable to client keys.
 
 ## License
 

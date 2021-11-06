@@ -33,7 +33,7 @@ public class Server {
         } else if (args[0].toUpperCase().equals("SIMETRICO")) {
             tipo = "SIMETRICO";
             try {
-                llaveSimetrica = Keys.readSecretKey("./src/app/security/keys/symmetric/server/SymmetricKey");
+                llaveSimetrica = Keys.readSecretKey("./src/app/security/keys/symmetric/server/ServerKey");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
