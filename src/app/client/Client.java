@@ -3,10 +3,14 @@ package app.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Scanner;
 
 import javax.crypto.SecretKey;
 
@@ -21,8 +25,8 @@ public class Client {
     private static PublicKey llavePublicaRepetidor;
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.err.println("Usage: java Client clientId type");
+        if (args.length != 3) {
+            System.err.println("Usage: java Client clientId messageId type");
             System.err.println("Valid types: [SIMETRICO|ASIMETRICO]");
             System.exit(1);
         } else if (args[0].toUpperCase().equals("SIMETRICO")) {
@@ -57,7 +61,7 @@ public class Client {
             System.out.println("El Cliente " + args[1] + " está listo para solicitar un mensaje...");
             while (true) {
                 Socket socket = serversock.accept();
-                new Thread(new ClienteDelegado(socket)).start();
+                new Thread(new ClienteDelegado(socket, args[1], args[2])).start();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,14 +70,49 @@ public class Client {
 
     public static class ClienteDelegado implements Runnable {
         Socket socket;
+        String clientId;
+        String messageId;
+        String messageString;
 
-        public ClienteDelegado(Socket s) {
-            socket = s;
+        public ClienteDelegado(Socket s, String clientId, String messageId) {
+            this.socket = s;
+            this.clientId = clientId;
+            this.messageId = messageId;
         }
 
         public void run() {
             try {
+                InputStream in = socket.getInputStream();
+                OutputStream out = socket.getOutputStream();
+                Scanner scanner = new Scanner(in, "UTF-8");
+                PrintWriter clientPrintOut = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true);
+            
+                System.out.println("El Cliente " + clientId + " está solicitando el mensaje: " + messageId);
+                if (tipo.equals("SIMETRICO")) {
+                    byte[] encryptedMessageId = Keys.cifrar(tipo, messageId, llaveSimetrica);
+                    String encapsulatedMessageId = Keys.byte2str(encryptedMessageId);
+                    clientPrintOut.println(encapsulatedMessageId);
+                } else {
+                    byte[] encryptedMessageId = Keys.cifrar(tipo, messageId, llavePublicaRepetidor);
+                    String encapsulatedMessageId = Keys.byte2str(encryptedMessageId);
+                    clientPrintOut.println(encapsulatedMessageId);
+                }
 
+                String message = scanner.nextLine();
+                byte[] messageBytes = Keys.str2byte(message);
+                if (tipo.equals("SIMETRICO")) {
+                    byte[] decryptedMessage = Keys.descifrar(tipo, messageBytes, llaveSimetrica);
+                    this.messageString = new String(decryptedMessage, StandardCharsets.UTF_8);
+                } else {
+                    byte[] decryptedMessage = Keys.descifrar(tipo, messageBytes, llavePrivada);
+                    this.messageString = new String(decryptedMessage, StandardCharsets.UTF_8);
+                }
+
+                System.out.println("El Cliente " + clientId + " recibió el mensaje: " + messageString);
+                clientPrintOut.println("Mensaje recibido");
+                out.flush();
+                scanner.close();
+                socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
