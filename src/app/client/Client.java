@@ -1,11 +1,9 @@
 package app.client;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
@@ -14,8 +12,8 @@ import java.util.Scanner;
 
 import javax.crypto.SecretKey;
 
+import app.repeater.Repeater;
 import app.security.Keys;
-import app.utils.Termination;
 
 public class Client {
     public static int port = 2730;
@@ -55,64 +53,51 @@ public class Client {
             System.exit(1);
         }
         try {
-            Runtime current = Runtime.getRuntime();
-            ServerSocket serversock = new ServerSocket(port);
-            current.addShutdownHook(new Termination(serversock));
-            System.out.println("El Cliente " + args[1] + " está listo para solicitar un mensaje...");
-            while (true) {
-                Socket socket = serversock.accept();
-                new Thread(new ClienteDelegado(socket, args[1], args[2])).start();
-            }
+            new Thread(new ClienteDelegado(args[1], args[2])).start();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static class ClienteDelegado implements Runnable {
-        Socket socket;
         String clientID;
         String messageID;
         String messageString;
 
-        public ClienteDelegado(Socket s, String clientID, String messageID) {
-            this.socket = s;
+        public ClienteDelegado(String clientID, String messageID) {
             this.clientID = clientID;
             this.messageID = messageID;
         }
 
         public void run() {
             try {
-                requestMessage();
-                getMessage();
-                socket.close();
+                Socket conexionRepeater = new Socket("127.0.0.1", Repeater.port);
+                requestMessageToRepeater(conexionRepeater);
+                getMessage(conexionRepeater);
+                conexionRepeater.close();
             } catch (Exception e) {
                 e.printStackTrace();
-                try {
-                    socket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
             }
         }
 
-        private void requestMessage() throws Exception {
-            OutputStream out = socket.getOutputStream();
-            PrintWriter clientPrintOut = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true);
+        private void requestMessageToRepeater(Socket conexionRepeater) throws Exception {
+            OutputStream outputToRepeater = conexionRepeater.getOutputStream();
+            PrintWriter clientPrintToRepeater = new PrintWriter(new OutputStreamWriter(outputToRepeater, "UTF-8"),
+                    true);
             System.out.println("El Cliente " + clientID + " está solicitando el mensaje: " + messageID);
             if (tipo.equals("SIMETRICO")) {
                 byte[] encryptedMessageID = Keys.encrypt(messageID, llaveSimetrica);
                 String encapsulatedMessageID = Keys.byte2str(encryptedMessageID);
-                clientPrintOut.println(encapsulatedMessageID);
+                clientPrintToRepeater.println(encapsulatedMessageID);
             } else {
                 byte[] encryptedMessageID = Keys.encrypt(messageID, llavePublicaRepetidor);
                 String encapsulatedMessageID = Keys.byte2str(encryptedMessageID);
-                clientPrintOut.println(encapsulatedMessageID);
+                clientPrintToRepeater.println(encapsulatedMessageID);
             }
-            out.flush();
         }
 
-        private void getMessage() throws Exception {
-            InputStream in = socket.getInputStream();
+        private void getMessage(Socket conexionRepeater) throws Exception {
+            InputStream in = conexionRepeater.getInputStream();
             Scanner scanner = new Scanner(in, "UTF-8");
             String message = scanner.nextLine();
             byte[] messageBytes = Keys.str2byte(message);
