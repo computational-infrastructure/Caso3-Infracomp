@@ -27,6 +27,10 @@ public class Client {
             System.err.println("Usage: java Client type clientID messageID");
             System.err.println("Valid types: [SIMETRICO|ASIMETRICO]");
             System.exit(1);
+        } else if (Integer.parseInt(args[2]) > 9 || Integer.parseInt(args[2]) < 0) {
+            System.err.println("Invalid arguments:");
+            System.err.println("messageID must be between 00 and 09");
+            System.exit(1);
         } else if (args[0].toUpperCase().equals("SIMETRICO")) {
             tipo = "SIMETRICO";
             try {
