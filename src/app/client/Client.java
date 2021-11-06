@@ -86,14 +86,14 @@ public class Client {
                 OutputStream out = socket.getOutputStream();
                 Scanner scanner = new Scanner(in, "UTF-8");
                 PrintWriter clientPrintOut = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true);
-            
+
                 System.out.println("El Cliente " + clientId + " está solicitando el mensaje: " + messageId);
                 if (tipo.equals("SIMETRICO")) {
-                    byte[] encryptedMessageId = Keys.cifrar(tipo, messageId, llaveSimetrica);
+                    byte[] encryptedMessageId = Keys.encrypt(messageId, llaveSimetrica);
                     String encapsulatedMessageId = Keys.byte2str(encryptedMessageId);
                     clientPrintOut.println(encapsulatedMessageId);
                 } else {
-                    byte[] encryptedMessageId = Keys.cifrar(tipo, messageId, llavePublicaRepetidor);
+                    byte[] encryptedMessageId = Keys.encrypt(messageId, llavePublicaRepetidor);
                     String encapsulatedMessageId = Keys.byte2str(encryptedMessageId);
                     clientPrintOut.println(encapsulatedMessageId);
                 }
@@ -101,15 +101,13 @@ public class Client {
                 String message = scanner.nextLine();
                 byte[] messageBytes = Keys.str2byte(message);
                 if (tipo.equals("SIMETRICO")) {
-                    byte[] decryptedMessage = Keys.descifrar(tipo, messageBytes, llaveSimetrica);
+                    byte[] decryptedMessage = Keys.decrypt(messageBytes, llaveSimetrica);
                     this.messageString = new String(decryptedMessage, StandardCharsets.UTF_8);
                 } else {
-                    byte[] decryptedMessage = Keys.descifrar(tipo, messageBytes, llavePrivada);
+                    byte[] decryptedMessage = Keys.decrypt(messageBytes, llavePrivada);
                     this.messageString = new String(decryptedMessage, StandardCharsets.UTF_8);
                 }
-
                 System.out.println("El Cliente " + clientId + " recibió el mensaje: " + messageString);
-                clientPrintOut.println("Mensaje recibido");
                 out.flush();
                 scanner.close();
                 socket.close();

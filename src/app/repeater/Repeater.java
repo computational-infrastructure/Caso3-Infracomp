@@ -91,24 +91,25 @@ public class Repeater {
                             "./src/app/security/keys/symmetric/client/Client" + identificadorCliente + "Key.key");
                     String idMensajeString = scanner.nextLine();
                     byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
-                    byte[] decryptedID = Keys.descifrar(tipo, idMensajeRaw, llaveSimetricaCliente);
+                    byte[] decryptedID = Keys.decrypt(idMensajeRaw, llaveSimetricaCliente);
                     String idString = new String(decryptedID, StandardCharsets.UTF_8);
-                    encryptedID = Keys.cifrar(tipo, idString, llaveSimetricaServidor);
+                    encryptedID = Keys.encrypt(idString, llaveSimetricaServidor);
                 } else {
                     llavePublicaCliente = Keys.readPublicKey(
                             "./src/app/security/keys/asymmetric/client/Client" + identificadorCliente + "Key.pub");
                     String idMensajeString = scanner.nextLine();
                     byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
-                    byte[] decryptedID = Keys.descifrar(tipo, idMensajeRaw, llavePrivada);
+                    byte[] decryptedID = Keys.decrypt(idMensajeRaw, llavePrivada);
                     String idString = new String(decryptedID, StandardCharsets.UTF_8);
-                    encryptedID = Keys.cifrar(tipo, idString, llavePublicaServidor);
+                    encryptedID = Keys.encrypt(idString, llavePublicaServidor);
                 }
                 String encryptedIDString = Keys.byte2str(encryptedID);
                 Socket conexionServer = new Socket("127.0.0.1", 1234);
                 InputStream inputToRepeaterFromServer = conexionServer.getInputStream();
                 OutputStream outputToServer = conexionServer.getOutputStream();
                 Scanner serverScanner = new Scanner(inputToRepeaterFromServer, "UTF-8");
-                PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"), true);
+                PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"),
+                        true);
                 if (serverScanner.nextLine().equals("OK")) {
                     repeaterPrintToServer.println(encryptedIDString);
                     String mensajeEncapsulado = serverScanner.nextLine();
@@ -117,14 +118,14 @@ public class Repeater {
                     conexionServer.close();
                     String mensajeReEncapsulado;
                     if (tipo.equals("SIMETRICO")) {
-                        byte[] mensajeDecrypted = Keys.descifrar(tipo, mensajeEncrypted, llaveSimetricaServidor);
+                        byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llaveSimetricaServidor);
                         String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
-                        byte[] mensajeReEncrypted = Keys.cifrar(tipo, mensajeDecryptedString, llaveSimetricaCliente);
+                        byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llaveSimetricaCliente);
                         mensajeReEncapsulado = Keys.byte2str(mensajeReEncrypted);
                     } else {
-                        byte[] mensajeDecrypted = Keys.descifrar(tipo, mensajeEncrypted, llavePrivada);
+                        byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llavePrivada);
                         String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
-                        byte[] mensajeReEncrypted = Keys.cifrar(tipo, mensajeDecryptedString, llavePublicaCliente);
+                        byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llavePublicaCliente);
                         mensajeReEncapsulado = Keys.byte2str(mensajeReEncrypted);
                     }
                     repeaterPrintOut.println(mensajeReEncapsulado);

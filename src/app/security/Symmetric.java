@@ -12,7 +12,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class Symmetric {
     private final static String PADDING = "AES/ECB/PKCS5Padding";
 
-    public static byte[] cifrar(SecretKey llave, String texto) {
+    public static byte[] encrypt(SecretKey llave, String texto) {
         byte[] textoCifrado;
 
         try {
@@ -29,7 +29,7 @@ public class Symmetric {
         }
     }
 
-    public static byte[] descifrar(SecretKey llave, byte[] texto) {
+    public static byte[] decrypt(SecretKey llave, byte[] texto) {
         byte[] textoClaro;
         try {
             Cipher cifrador = Cipher.getInstance(PADDING);

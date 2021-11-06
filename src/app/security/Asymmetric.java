@@ -15,7 +15,7 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.*;
 
 public class Asymmetric {
-    public static byte[] cifrar(Key llave, String algoritmo, String texto) {
+    public static byte[] encrypt(Key llave, String algoritmo, String texto) {
         byte[] textoCifrado;
         try {
             Cipher cifrador = Cipher.getInstance(algoritmo);
@@ -31,7 +31,7 @@ public class Asymmetric {
         }
     }
 
-    public static byte[] descifrar(Key llave, String algoritmo, byte[] texto) {
+    public static byte[] decrypt(Key llave, String algoritmo, byte[] texto) {
         byte[] textoClaro;
 
         try {

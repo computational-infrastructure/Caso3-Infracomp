@@ -67,6 +67,7 @@ public class Server {
             e.printStackTrace();
             System.exit(1);
         }
+
         // Inicio del servidor
         try {
             Runtime current = Runtime.getRuntime();
@@ -97,24 +98,25 @@ public class Server {
                 PrintWriter serverPrintOut = new PrintWriter(new OutputStreamWriter(outputFromServer, "UTF-8"), true);
                 serverPrintOut.println("OK");
                 String identificador = scanner.nextLine();
-                byte[] idArray = Keys.str2byte(identificador);
+                byte[] idBytes = Keys.str2byte(identificador);
                 if (tipo.equals("SIMETRICO")) {
-                    byte[] decryptedID = Keys.descifrar(tipo, idArray, llaveSimetrica);
+                    byte[] decryptedID = Keys.decrypt(idBytes, llaveSimetrica);
                     String idString = new String(decryptedID, StandardCharsets.UTF_8);
                     int idMensaje = Integer.parseInt(idString);
                     String mensaje = mensajes[idMensaje];
-                    byte[] encryptedMessage = Keys.cifrar(tipo, mensaje, llaveSimetrica);
+                    byte[] encryptedMessage = Keys.encrypt(mensaje, llaveSimetrica);
                     String mensajeEncapsulado = Keys.byte2str(encryptedMessage);
                     serverPrintOut.println(mensajeEncapsulado);
                 } else {
-                    byte[] decryptedID = Keys.descifrar(tipo, idArray, llavePrivada);
+                    byte[] decryptedID = Keys.decrypt(idBytes, llavePrivada);
                     String idString = new String(decryptedID, StandardCharsets.UTF_8);
                     int idMensaje = Integer.parseInt(idString);
                     String mensaje = mensajes[idMensaje];
-                    byte[] encryptedMessage = Keys.cifrar(tipo, mensaje, llavePublicaRepetidor);
+                    byte[] encryptedMessage = Keys.encrypt(mensaje, llavePublicaRepetidor);
                     String mensajeEncapsulado = Keys.byte2str(encryptedMessage);
                     serverPrintOut.println(mensajeEncapsulado);
                 }
+                outputFromServer.flush();
                 scanner.close();
                 socket.close();
             } catch (Exception e) {
