@@ -78,9 +78,14 @@ public class Repeater {
 
         public void run() {
             try {
-                String encryptedIDString = Keys.byte2str(getClientRequestID());
+                InputStream inputToRepeater = socket.getInputStream();
+                Scanner scanner = new Scanner(inputToRepeater, "UTF-8");
+
+                String encryptedIDString = Keys.byte2str(getClientRequestID(scanner));
                 String message = requestMessageToServer(encryptedIDString);
                 sendMessageToClient(message);
+
+                scanner.close();
                 socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -92,15 +97,13 @@ public class Repeater {
             }
         }
 
-        private byte[] getClientRequestID() throws Exception {
-            InputStream inputToRepeater = socket.getInputStream();
-            Scanner scanner = new Scanner(inputToRepeater, "UTF-8");
+        private byte[] getClientRequestID(Scanner scanner) throws Exception {
             String identificador = scanner.nextLine();
             int identificadorCliente = Integer.parseInt(identificador);
             byte[] encryptedID;
             if (tipo.equals("SIMETRICO")) {
                 llaveSimetricaCliente = Keys.readSecretKey(
-                        "./src/app/security/keys/symmetric/client/Client" + identificadorCliente + "Key.key");
+                        "./src/app/security/keys/symmetric/clients/Client" + identificadorCliente + "Key");
                 String idMensajeString = scanner.nextLine();
                 byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
                 byte[] decryptedID = Keys.decrypt(idMensajeRaw, llaveSimetricaCliente);
@@ -108,14 +111,13 @@ public class Repeater {
                 encryptedID = Keys.encrypt(idString, llaveSimetricaServidor);
             } else {
                 llavePublicaCliente = Keys.readPublicKey(
-                        "./src/app/security/keys/asymmetric/client/Client" + identificadorCliente + "Key.pub");
+                        "./src/app/security/keys/asymmetric/clients/Client" + identificadorCliente + "Key.pub");
                 String idMensajeString = scanner.nextLine();
                 byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
                 byte[] decryptedID = Keys.decrypt(idMensajeRaw, llavePrivada);
                 String idString = new String(decryptedID, StandardCharsets.UTF_8);
                 encryptedID = Keys.encrypt(idString, llavePublicaServidor);
             }
-            scanner.close();
             return encryptedID;
         }
 

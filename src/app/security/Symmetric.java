@@ -2,7 +2,6 @@ package app.security;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.security.spec.KeySpec;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -42,7 +41,7 @@ public class Symmetric {
 
     public static void main(String[] args) {
         try {
-            writeKey(128, "./src/app/security/keys/symmetric/server/SymmetricKey", "AES");
+            writeKey(128, "./src/app/security/keys/symmetric/clients/Client1Key", "AES");
         } catch (Exception e) {
             e.printStackTrace();
         }

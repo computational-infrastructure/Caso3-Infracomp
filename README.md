@@ -9,11 +9,13 @@ Simplified prototype of a client, repeater and server system in which the commun
 
 If you want to individually run the components, run the following commands at different terminals:
 
-1. For running server, please use `java -cp ./bin app.server.Server SIMETRICO`.
-2. For running repeater, please use `java -cp ./bin app.server.Repeater SIMETRICO`.
-3. For running client, please use `java -cp ./bin app.client.Client SIMETRICO`.
+1. For running server, please use `java -cp ./bin app.server.Server type`.
+2. For running repeater, please use `java -cp ./bin app.repeater.Repeater type`.
+3. For running client, please use `java -cp ./bin app.client.Client type clientID messageID`.
 
-Remember that you could change `SIMETRICO` to `ASIMETRICO` according to the desired encryption type.
+- Remember that you could use type `SIMETRICO` or `ASIMETRICO` according to the desired encryption type.
+- The clientID is an integer number.
+- The messageID is an integer number between 00 and 09.
 
 ## License
 

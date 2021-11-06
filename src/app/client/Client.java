@@ -24,14 +24,14 @@ public class Client {
 
     public static void main(String[] args) {
         if (args.length != 3) {
-            System.err.println("Usage: java Client clientID messageID type");
+            System.err.println("Usage: java Client type clientID messageID");
             System.err.println("Valid types: [SIMETRICO|ASIMETRICO]");
             System.exit(1);
         } else if (args[0].toUpperCase().equals("SIMETRICO")) {
             tipo = "SIMETRICO";
             try {
                 llaveSimetrica = Keys
-                        .readSecretKey("./src/app/security/keys/symmetric/client/Client" + args[1] + "Key.key");
+                        .readSecretKey("./src/app/security/keys/symmetric/clients/Client" + args[1] + "Key");
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -40,7 +40,7 @@ public class Client {
             tipo = "ASIMETRICO";
             try {
                 llavePrivada = Keys
-                        .readPrivateKey("./src/app/security/keys/asymmetric/client/Client" + args[1] + "Key.key");
+                        .readPrivateKey("./src/app/security/keys/asymmetric/clients/Client" + args[1] + "Key");
                 llavePublicaRepetidor = Keys
                         .readPublicKey("./src/app/security/keys/asymmetric/repeater/RepeaterKey.pub");
             } catch (Exception e) {
@@ -85,6 +85,7 @@ public class Client {
             PrintWriter clientPrintToRepeater = new PrintWriter(new OutputStreamWriter(outputToRepeater, "UTF-8"),
                     true);
             System.out.println("El Cliente " + clientID + " está solicitando el mensaje: " + messageID);
+            clientPrintToRepeater.println(clientID);
             if (tipo.equals("SIMETRICO")) {
                 byte[] encryptedMessageID = Keys.encrypt(messageID, llaveSimetrica);
                 String encapsulatedMessageID = Keys.byte2str(encryptedMessageID);
