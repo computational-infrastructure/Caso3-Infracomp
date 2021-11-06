@@ -48,6 +48,10 @@ public class Symmetric {
                 System.err.println("Optional: client id");
                 System.exit(1);
             } else if (args[0].equalsIgnoreCase("client")) {
+                if (args.length < 2) {
+                    System.err.println("missing client id");
+                    System.exit(1);
+                }
                 writeKey(128, path + "clients/Client" + args[1] + "Key", "AES");
             } else if (args[0].equalsIgnoreCase("server")) {
                 writeKey(128, path + "server/ServerKey", "AES");

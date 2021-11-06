@@ -44,7 +44,7 @@ public class Client {
             tipo = "ASIMETRICO";
             try {
                 llavePrivada = Keys
-                        .readPrivateKey("./src/app/security/keys/asymmetric/clients/Client" + args[1] + "Key");
+                        .readPrivateKey("./src/app/security/keys/asymmetric/clients/Client" + args[1] + "Key.key");
                 llavePublicaRepetidor = Keys
                         .readPublicKey("./src/app/security/keys/asymmetric/repeater/RepeaterKey.pub");
             } catch (Exception e) {

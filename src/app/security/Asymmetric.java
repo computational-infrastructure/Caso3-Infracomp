@@ -53,7 +53,28 @@ public class Asymmetric {
     }
 
     public static void main(String[] args) {
-        writeKey("./src/app/security/keys/asymmetric/server/ServerKey");
+        String path = "./src/app/security/keys/asymmetric/";
+        if (args.length < 1) {
+            System.err.println("Usage: java Asymmetric type [id]");
+            System.err.println("Valid types: [client|server|repeater]");
+            System.err.println("Optional: client id");
+            System.exit(1);
+        } else if (args[0].equalsIgnoreCase("client")) {
+            if (args.length < 2) {
+                System.err.println("missing client id");
+                System.exit(1);
+            }
+            writeKey(path + "clients/Client" + args[1] + "Key");
+        } else if (args[0].equalsIgnoreCase("server")) {
+            writeKey(path + "server/ServerKey");
+        } else if (args[0].equalsIgnoreCase("repeater")) {
+            writeKey(path + "repeater/RepeaterKey");
+        } else {
+            System.err.println("Invalid arguments: " + args);
+            System.err.println("Valid types: [client|server|repeater]");
+            System.err.println("Optional: client id");
+            System.exit(1);
+        }
     }
 
     public static void writeKey(String output) {
