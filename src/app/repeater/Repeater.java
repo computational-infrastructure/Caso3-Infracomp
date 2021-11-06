@@ -15,10 +15,11 @@ import java.util.Scanner;
 import javax.crypto.SecretKey;
 
 import app.security.Keys;
+import app.server.Server;
 import app.utils.Termination;
 
 public class Repeater {
-    private static int port = 9030;
+    public static int port = 9030;
     private static SecretKey llaveSimetricaServidor;
     private static PrivateKey llavePrivada;
     private static PublicKey llavePublicaServidor;
@@ -104,7 +105,7 @@ public class Repeater {
                     encryptedID = Keys.encrypt(idString, llavePublicaServidor);
                 }
                 String encryptedIDString = Keys.byte2str(encryptedID);
-                Socket conexionServer = new Socket("127.0.0.1", 1234);
+                Socket conexionServer = new Socket("127.0.0.1", Server.port);
                 InputStream inputToRepeaterFromServer = conexionServer.getInputStream();
                 OutputStream outputToServer = conexionServer.getOutputStream();
                 Scanner serverScanner = new Scanner(inputToRepeaterFromServer, "UTF-8");

@@ -18,7 +18,7 @@ import app.security.Keys;
 import app.utils.Termination;
 
 public class Server {
-    private static int port = 1234;
+    public static int port = 1234;
     private static String[] mensajes = new String[10];
     private static String tipo;
     private static SecretKey llaveSimetrica;

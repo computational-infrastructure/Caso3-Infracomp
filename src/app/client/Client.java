@@ -18,7 +18,7 @@ import app.security.Keys;
 import app.utils.Termination;
 
 public class Client {
-    private static int port = 2730;
+    public static int port = 2730;
     private static String tipo;
     private static SecretKey llaveSimetrica;
     private static PrivateKey llavePrivada;
