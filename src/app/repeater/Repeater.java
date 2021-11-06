@@ -69,69 +69,18 @@ public class Repeater {
     // Inicio del Repetidor
     public static class RepetidorDelegado implements Runnable {
         Socket socket;
+        private SecretKey llaveSimetricaCliente;
+        private PublicKey llavePublicaCliente;
 
         public RepetidorDelegado(Socket s) {
             socket = s;
         }
 
-        private SecretKey llaveSimetricaCliente;
-        private PublicKey llavePublicaCliente;
-
         public void run() {
             try {
-                InputStream inputToRepeater = socket.getInputStream();
-                OutputStream outputToClient = socket.getOutputStream();
-                Scanner scanner = new Scanner(inputToRepeater, "UTF-8");
-                PrintWriter repeaterPrintOut = new PrintWriter(new OutputStreamWriter(outputToClient, "UTF-8"), true);
-                String identificador = scanner.nextLine();
-                int identificadorCliente = Integer.parseInt(identificador);
-                repeaterPrintOut.println("OK");
-                byte[] encryptedID;
-                if (tipo.equals("SIMETRICO")) {
-                    llaveSimetricaCliente = Keys.readSecretKey(
-                            "./src/app/security/keys/symmetric/client/Client" + identificadorCliente + "Key.key");
-                    String idMensajeString = scanner.nextLine();
-                    byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
-                    byte[] decryptedID = Keys.decrypt(idMensajeRaw, llaveSimetricaCliente);
-                    String idString = new String(decryptedID, StandardCharsets.UTF_8);
-                    encryptedID = Keys.encrypt(idString, llaveSimetricaServidor);
-                } else {
-                    llavePublicaCliente = Keys.readPublicKey(
-                            "./src/app/security/keys/asymmetric/client/Client" + identificadorCliente + "Key.pub");
-                    String idMensajeString = scanner.nextLine();
-                    byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
-                    byte[] decryptedID = Keys.decrypt(idMensajeRaw, llavePrivada);
-                    String idString = new String(decryptedID, StandardCharsets.UTF_8);
-                    encryptedID = Keys.encrypt(idString, llavePublicaServidor);
-                }
-                String encryptedIDString = Keys.byte2str(encryptedID);
-                Socket conexionServer = new Socket("127.0.0.1", Server.port);
-                InputStream inputToRepeaterFromServer = conexionServer.getInputStream();
-                OutputStream outputToServer = conexionServer.getOutputStream();
-                Scanner serverScanner = new Scanner(inputToRepeaterFromServer, "UTF-8");
-                PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"),
-                        true);
-                if (serverScanner.nextLine().equals("OK")) {
-                    repeaterPrintToServer.println(encryptedIDString);
-                    String mensajeEncapsulado = serverScanner.nextLine();
-                    byte[] mensajeEncrypted = Keys.str2byte(mensajeEncapsulado);
-                    serverScanner.close();
-                    conexionServer.close();
-                    String mensajeReEncapsulado;
-                    if (tipo.equals("SIMETRICO")) {
-                        byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llaveSimetricaServidor);
-                        String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
-                        byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llaveSimetricaCliente);
-                        mensajeReEncapsulado = Keys.byte2str(mensajeReEncrypted);
-                    } else {
-                        byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llavePrivada);
-                        String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
-                        byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llavePublicaCliente);
-                        mensajeReEncapsulado = Keys.byte2str(mensajeReEncrypted);
-                    }
-                    repeaterPrintOut.println(mensajeReEncapsulado);
-                }
-                scanner.close();
+                String encryptedIDString = Keys.byte2str(getClientRequestID());
+                String message = requestMessageToServer(encryptedIDString);
+                sendMessageToClient(message);
                 socket.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -141,6 +90,67 @@ public class Repeater {
                     e1.printStackTrace();
                 }
             }
+        }
+
+        private byte[] getClientRequestID() throws Exception {
+            InputStream inputToRepeater = socket.getInputStream();
+            Scanner scanner = new Scanner(inputToRepeater, "UTF-8");
+            String identificador = scanner.nextLine();
+            int identificadorCliente = Integer.parseInt(identificador);
+            byte[] encryptedID;
+            if (tipo.equals("SIMETRICO")) {
+                llaveSimetricaCliente = Keys.readSecretKey(
+                        "./src/app/security/keys/symmetric/client/Client" + identificadorCliente + "Key.key");
+                String idMensajeString = scanner.nextLine();
+                byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
+                byte[] decryptedID = Keys.decrypt(idMensajeRaw, llaveSimetricaCliente);
+                String idString = new String(decryptedID, StandardCharsets.UTF_8);
+                encryptedID = Keys.encrypt(idString, llaveSimetricaServidor);
+            } else {
+                llavePublicaCliente = Keys.readPublicKey(
+                        "./src/app/security/keys/asymmetric/client/Client" + identificadorCliente + "Key.pub");
+                String idMensajeString = scanner.nextLine();
+                byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
+                byte[] decryptedID = Keys.decrypt(idMensajeRaw, llavePrivada);
+                String idString = new String(decryptedID, StandardCharsets.UTF_8);
+                encryptedID = Keys.encrypt(idString, llavePublicaServidor);
+            }
+            scanner.close();
+            return encryptedID;
+        }
+
+        private String requestMessageToServer(String encryptedIDString) throws Exception {
+            Socket conexionServer = new Socket("127.0.0.1", Server.port);
+            InputStream inputToRepeaterFromServer = conexionServer.getInputStream();
+            OutputStream outputToServer = conexionServer.getOutputStream();
+            Scanner serverScanner = new Scanner(inputToRepeaterFromServer, "UTF-8");
+            PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"), true);
+            String mensajeRecibido = "No se logró obtener el mensaje";
+            if (serverScanner.nextLine().equals("OK")) {
+                repeaterPrintToServer.println(encryptedIDString);
+                String mensajeEncapsulado = serverScanner.nextLine();
+                byte[] mensajeEncrypted = Keys.str2byte(mensajeEncapsulado);
+                if (tipo.equals("SIMETRICO")) {
+                    byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llaveSimetricaServidor);
+                    String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
+                    byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llaveSimetricaCliente);
+                    mensajeRecibido = Keys.byte2str(mensajeReEncrypted);
+                } else {
+                    byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llavePrivada);
+                    String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
+                    byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llavePublicaCliente);
+                    mensajeRecibido = Keys.byte2str(mensajeReEncrypted);
+                }
+            }
+            serverScanner.close();
+            conexionServer.close();
+            return mensajeRecibido;
+        }
+
+        private void sendMessageToClient(String mensajeRecibido) throws Exception {
+            OutputStream outputToClient = socket.getOutputStream();
+            PrintWriter repeaterPrintOut = new PrintWriter(new OutputStreamWriter(outputToClient, "UTF-8"), true);
+            repeaterPrintOut.println(mensajeRecibido);
         }
     }
 }

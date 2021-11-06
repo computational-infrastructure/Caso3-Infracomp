@@ -26,7 +26,7 @@ public class Client {
 
     public static void main(String[] args) {
         if (args.length != 3) {
-            System.err.println("Usage: java Client clientId messageId type");
+            System.err.println("Usage: java Client clientID messageID type");
             System.err.println("Valid types: [SIMETRICO|ASIMETRICO]");
             System.exit(1);
         } else if (args[0].toUpperCase().equals("SIMETRICO")) {
@@ -70,14 +70,14 @@ public class Client {
 
     public static class ClienteDelegado implements Runnable {
         Socket socket;
-        String clientId;
-        String messageId;
+        String clientID;
+        String messageID;
         String messageString;
 
-        public ClienteDelegado(Socket s, String clientId, String messageId) {
+        public ClienteDelegado(Socket s, String clientID, String messageID) {
             this.socket = s;
-            this.clientId = clientId;
-            this.messageId = messageId;
+            this.clientID = clientID;
+            this.messageID = messageID;
         }
 
         public void run() {
@@ -98,15 +98,15 @@ public class Client {
         private void requestMessage() throws Exception {
             OutputStream out = socket.getOutputStream();
             PrintWriter clientPrintOut = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true);
-            System.out.println("El Cliente " + clientId + " está solicitando el mensaje: " + messageId);
+            System.out.println("El Cliente " + clientID + " está solicitando el mensaje: " + messageID);
             if (tipo.equals("SIMETRICO")) {
-                byte[] encryptedMessageId = Keys.encrypt(messageId, llaveSimetrica);
-                String encapsulatedMessageId = Keys.byte2str(encryptedMessageId);
-                clientPrintOut.println(encapsulatedMessageId);
+                byte[] encryptedMessageID = Keys.encrypt(messageID, llaveSimetrica);
+                String encapsulatedMessageID = Keys.byte2str(encryptedMessageID);
+                clientPrintOut.println(encapsulatedMessageID);
             } else {
-                byte[] encryptedMessageId = Keys.encrypt(messageId, llavePublicaRepetidor);
-                String encapsulatedMessageId = Keys.byte2str(encryptedMessageId);
-                clientPrintOut.println(encapsulatedMessageId);
+                byte[] encryptedMessageID = Keys.encrypt(messageID, llavePublicaRepetidor);
+                String encapsulatedMessageID = Keys.byte2str(encryptedMessageID);
+                clientPrintOut.println(encapsulatedMessageID);
             }
             out.flush();
         }
@@ -123,7 +123,7 @@ public class Client {
                 byte[] decryptedMessage = Keys.decrypt(messageBytes, llavePrivada);
                 this.messageString = new String(decryptedMessage, StandardCharsets.UTF_8);
             }
-            System.out.println("El Cliente " + clientId + " recibió el mensaje: " + messageString);
+            System.out.println("El Cliente " + clientID + " recibió el mensaje: " + messageString);
             scanner.close();
         }
     }
