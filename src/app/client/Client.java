@@ -16,7 +16,6 @@ import app.repeater.Repeater;
 import app.security.Keys;
 
 public class Client {
-    public static int port = 2730;
     private static String tipo;
     private static SecretKey llaveSimetrica;
     private static PrivateKey llavePrivada;

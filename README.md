@@ -7,7 +7,7 @@ Simplified prototype of a client, repeater and server system in which the commun
 ### Communication prototype running
 
 1. Open a terminal at root of this project `Caso3-InfraComp/`.
-2. Run `make communication` for running all the components.
+2. Execute `java -cp ./bin app.App` for running all the components. This will ask you and start the desired number of clients, repeater and server. For each client, you will be asked to enter their client ID and message ID for being requested. Then you will be able to see the message received by each client with a thread indicator.
 
 If you want to individually visualize the components, run the following commands at different terminals:
 
@@ -23,8 +23,8 @@ If you want to individually visualize the components, run the following commands
 
 When you need to generate a new key, run the following command:
 
-For symmetric encryption: `java -cp ./bin app.security.Symmetric type [id]`
-For asymmetric encryption: `java -cp ./bin app.security.Asymmetric type [id]`
+1. For symmetric encryption: `java -cp ./bin app.security.Symmetric type [id]`.
+2. For asymmetric encryption: `java -cp ./bin app.security.Asymmetric type [id]`.
 
 - The valid types are `client`, `repeater` or `server`.
 - The `id` is an integer number and is only applicable to client keys.

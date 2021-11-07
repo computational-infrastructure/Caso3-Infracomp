@@ -3,12 +3,13 @@ package app;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.CyclicBarrier;
 
 public class App {
     public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         ArrayList<String> clientes = new ArrayList<String>();
-        System.out.println("¿Qué tipo de cifrado quiere utilizar?");
+        System.out.println("\n¿Qué tipo de cifrado quiere utilizar?");
         System.out.println(" - SIMETRICO");
         System.out.println(" - ASIMETRICO");
         String tipo = s.nextLine();
@@ -16,16 +17,16 @@ public class App {
             System.out.println("Tipo de cifrado no válido");
             System.exit(1);
         }
-        System.out.println("¿Cuántos Clientes van a recibir mensajes?");
+        System.out.println("\n¿Cuántos Clientes van a recibir mensajes?");
         int numClientes = Integer.parseInt(s.nextLine());
         try {
             String servidor = "java -cp ./bin app.server.Server " + tipo;
             String repetidor = "java -cp ./bin app.repeater.Repeater " + tipo;
-            Runtime.getRuntime().exec(servidor);
-            Runtime.getRuntime().exec(repetidor);
+            Process pS = Runtime.getRuntime().exec(servidor);
+            Process pR = Runtime.getRuntime().exec(repetidor);
             for (int i = 0; i < numClientes; i++) {
                 String cliente = "java -cp ./bin app.client.Client " + tipo + " ";
-                System.out.println("Digite el ID del cliente número " + (i + 1) + ":");
+                System.out.println("\nDigite el ID del cliente número " + (i + 1) + ":");
                 String id = s.nextLine();
                 Integer.parseInt(id);
                 cliente += id + " ";
@@ -44,10 +45,19 @@ public class App {
                     Runtime.getRuntime().exec("java -cp ./bin app.security.Asymmetric client " + id);
                 }
             }
+            System.out.println("\n----------------");
             System.out.println("A continuación iniciará la ejecución de los threads de todos los clientes registrados");
             Thread.sleep(500);
             s.close();
+            Proceso.barrera = new CyclicBarrier(numClientes + 1);
             new App().execute(clientes);
+            Proceso.barrera.await();
+            System.out.println("\n----------------");
+            System.out.println("Se ha finalizado la ejecución del prototipo de comunicación");
+            pS.destroy();
+            pR.destroy();
+            Thread.sleep(500);
+            System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,6 +73,7 @@ public class App {
     public class Proceso implements Runnable {
         private int prIndex;
         private String executable;
+        private static CyclicBarrier barrera;
 
         public Proceso(int k, String cmd) {
             prIndex = k;
@@ -77,6 +88,7 @@ public class App {
                     System.out.println("[" + prIndex + "] " + s);
                 }
                 br.close();
+                Proceso.barrera.await();
             } catch (Exception ioex) {
                 System.err.println("IOException for process #" + prIndex + ": " + ioex.getMessage());
             }

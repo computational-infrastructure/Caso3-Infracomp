@@ -19,7 +19,7 @@ import app.server.Server;
 import app.utils.Termination;
 
 public class Repeater {
-    public static int port = 9030;
+    public static int port = 9812;
     private static SecretKey llaveSimetricaServidor;
     private static PrivateKey llavePrivada;
     private static PublicKey llavePublicaServidor;
