@@ -52,11 +52,12 @@ public class App {
             Proceso.barrera = new CyclicBarrier(numClientes + 1);
             new App().execute(clientes);
             Proceso.barrera.await();
-            System.out.println("\n----------------");
-            System.out.println("Se ha finalizado la ejecución del prototipo de comunicación");
             pS.destroy();
             pR.destroy();
-            Thread.sleep(500);
+            pS.waitFor();
+            pR.waitFor();
+            System.out.println("\n----------------");
+            System.out.println("Se ha finalizado la ejecución del prototipo de comunicación");
             System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();

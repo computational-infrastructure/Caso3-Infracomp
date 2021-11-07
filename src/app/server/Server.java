@@ -18,7 +18,7 @@ import app.security.Keys;
 import app.utils.Termination;
 
 public class Server {
-    public static int port = 1511;
+    public static int port = 22600;
     private static String[] mensajes = new String[10];
     private static String tipo;
     private static SecretKey llaveSimetrica;
@@ -73,7 +73,7 @@ public class Server {
             Runtime current = Runtime.getRuntime();
             ServerSocket serversock = new ServerSocket(port);
             current.addShutdownHook(new Termination(serversock));
-            System.out.println("El Servidor está corriendo...");
+            System.out.println("Server listening on port " + port + "...");
             while (true) {
                 Socket socket = serversock.accept();
                 new Thread(new ServidorDelegado(socket)).start();

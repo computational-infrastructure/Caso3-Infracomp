@@ -19,7 +19,7 @@ import app.server.Server;
 import app.utils.Termination;
 
 public class Repeater {
-    public static int port = 9812;
+    public static int port = 27700;
     private static SecretKey llaveSimetricaServidor;
     private static PrivateKey llavePrivada;
     private static PublicKey llavePublicaServidor;
@@ -56,7 +56,7 @@ public class Repeater {
             Runtime current = Runtime.getRuntime();
             ServerSocket serversock = new ServerSocket(port);
             current.addShutdownHook(new Termination(serversock));
-            System.out.println("El Repetidor está corriendo...");
+            System.out.println("Repeater listening on port " + port + "...");
             while (true) {
                 Socket socket = serversock.accept();
                 new Thread(new RepetidorDelegado(socket)).start();

@@ -12,7 +12,7 @@ public class Termination extends Thread {
 
     public void run() {
         try {
-            System.out.println("\nCerrando el ServerSocket en el puerto " + servSock.getLocalPort());
+            System.out.println("\nClosing ServerSocket on port " + servSock.getLocalPort());
             servSock.close();
         } catch (IOException e) {
             e.printStackTrace();
