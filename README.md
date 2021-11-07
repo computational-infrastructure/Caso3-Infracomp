@@ -7,15 +7,16 @@ Simplified prototype of a client, repeater and server system in which the commun
 ### Communication prototype running
 
 1. Open a terminal at root of this project `Caso3-InfraComp/`.
-2. Execute `java -cp ./bin app.App` for running all the components. This will ask you and start the desired number of clients, repeater and server. For each client, you will be asked to enter their client ID and message ID for being requested. Then you will be able to see the message received by each client with a thread indicator.
+2. Execute App.java or use `java -cp ./bin app.App` for running all the components. This will ask you the encryption type for all the following communications, and start the desired number of clients, repeater and server. For each client, you will be asked to enter their client ID and message ID for being requested. Then, the program will execute different processes for automatically generating the needed keys at all communications. Finally, you will be able to see the message received by each client with a thread indicator.
 
 If you want to individually visualize the components, run the following commands at different terminals:
 
-1. For running server, please use `java -cp ./bin app.server.Server type`.
-2. For running repeater, please use `java -cp ./bin app.repeater.Repeater type`.
-3. For running client, please use `java -cp ./bin app.client.Client type clientID messageID`.
+1. Make sure that all the client, server, and repeater keys to be used are generated. If you need to create new keys, follow the instructions at the [keys generation section](#keys-generation).
+2. For running server, please use `java -cp ./bin app.server.Server type`.
+3. For running repeater, please use `java -cp ./bin app.repeater.Repeater type`.
+4. For running client, please use `java -cp ./bin app.client.Client type clientID messageID`.
 
-- Remember that you could use type `SIMETRICO` or `ASIMETRICO` according to the desired encryption type.
+- Remember that you could use type `SIMETRICO` or `ASIMETRICO` according to the desired encryption type. The type must be the same for all the components in an execution.
 - The clientID is an integer number.
 - The messageID is an integer number between 00 and 09.
 
@@ -35,3 +36,4 @@ When you need to generate a new key, run the following command:
 
 - **[MIT license](LICENSE)**
 - Copyright 2021 © Juan Romero & Juan Alegría
+
