@@ -4,87 +4,81 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class App 
-{
-    public static void main(String[] args)
-    {
+public class App {
+    public static void main(String[] args) {
         Scanner s = new Scanner(System.in);
         ArrayList<String> clientes = new ArrayList<String>();
-        ArrayList<String> comandos = new ArrayList<String>();
         System.out.println("¿Qué tipo de cifrado quiere utilizar?");
         System.out.println(" - SIMETRICO");
         System.out.println(" - ASIMETRICO");
         String tipo = s.nextLine();
+        if (!tipo.equalsIgnoreCase("SIMETRICO") && !tipo.equalsIgnoreCase("ASIMETRICO")) {
+            System.out.println("Tipo de cifrado no válido");
+            System.exit(1);
+        }
         System.out.println("¿Cuántos Clientes van a recibir mensajes?");
         int numClientes = Integer.parseInt(s.nextLine());
-        try
-        {
-            String servidor = "java -cp ./bin app.server.Server "+tipo;
-            String repetidor = "java -cp ./bin app.repeater.Repeater "+tipo;
-            comandos.add(servidor);
-            comandos.add(repetidor);
-            for (int i = 0; i < numClientes; i++)
-            {
-                String cliente = "java -cp ./bin app.client.Client " + tipo;
-                System.out.println("Digite el id del cliente:");
-                cliente += s.nextLine() + " ";
-                System.out.println("Digite el id del mensaje que quiere recuperar el cliente:");
-                cliente += s.nextLine();
+        try {
+            String servidor = "java -cp ./bin app.server.Server " + tipo;
+            String repetidor = "java -cp ./bin app.repeater.Repeater " + tipo;
+            Runtime.getRuntime().exec(servidor);
+            Runtime.getRuntime().exec(repetidor);
+            for (int i = 0; i < numClientes; i++) {
+                String cliente = "java -cp ./bin app.client.Client " + tipo + " ";
+                System.out.println("Digite el ID del cliente número " + (i + 1) + ":");
+                String id = s.nextLine();
+                Integer.parseInt(id);
+                cliente += id + " ";
+                System.out.println("Digite el ID del mensaje que quiere recuperar el cliente:");
+                String mensaje = s.nextLine();
+                if (Integer.parseInt(mensaje) > 9 || Integer.parseInt(mensaje) < 0) {
+                    System.err.println("The message ID must be between 00 and 09");
+                    i -= 1;
+                    continue;
+                }
+                cliente += mensaje;
                 clientes.add(cliente);
+                if (tipo.equalsIgnoreCase("SIMETRICO")) {
+                    Runtime.getRuntime().exec("java -cp ./bin app.security.Symmetric client " + id);
+                } else if (tipo.equalsIgnoreCase("ASIMETRICO")){
+                    Runtime.getRuntime().exec("java -cp ./bin app.security.Asymmetric client " + id);
+                }
             }
+            System.out.println("A continuación iniciará la ejecución de los threads de todos los clientes registrados");
+            Thread.sleep(500);
             s.close();
-            new App().execute(comandos);
             new App().execute(clientes);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void execute(ArrayList<String> comandos)
-    {
-        for (int i = 0 ; i < comandos.size() ; i++) 
-        {
+    public void execute(ArrayList<String> comandos) {
+        for (int i = 0; i < comandos.size(); i++) {
             Proceso ec = new Proceso(i, comandos.get(i));
-            new Thread (ec).start();
-        }   
+            new Thread(ec).start();
+        }
     }
 
-    public class Proceso implements Runnable
-    {
+    public class Proceso implements Runnable {
         private int prIndex;
         private String executable;
-        
-        public Proceso(int k, String cmd)
-        {
+
+        public Proceso(int k, String cmd) {
             prIndex = k;
             executable = cmd;
         }
 
-        public void run()
-        {
-            try
-            {
+        public void run() {
+            try {
                 Process child = Runtime.getRuntime().exec(executable);
                 BufferedReader br = new BufferedReader(new InputStreamReader(child.getInputStream()));
-                for (String s = br.readLine() ; s != null ; s = br.readLine())
-                {
-                    System.out.println ("[" + prIndex + "] " + s);
-                    try
-                    {
-                        Thread.sleep(20);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                for (String s = br.readLine(); s != null; s = br.readLine()) {
+                    System.out.println("[" + prIndex + "] " + s);
                 }
                 br.close();
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
+            } catch (Exception ioex) {
+                System.err.println("IOException for process #" + prIndex + ": " + ioex.getMessage());
             }
         }
     }
