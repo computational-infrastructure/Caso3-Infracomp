@@ -7,22 +7,22 @@ Simplified prototype of a client, repeater and server system in which the commun
 ### Communication prototype running
 
 1. Open a terminal at root of this project `Caso3-InfraComp/`.
-2. Execute App.java or use `java -cp ./bin app.App` for running all the components. This will ask you the encryption type for all the following communications, and start the desired number of clients, repeater and server. For each client, you will be asked to enter their client ID and message ID for being requested. Then, the program will execute different processes for automatically generating the needed keys at all communications. Finally, you will be able to see the message received by each client with a thread indicator.
+2. Execute App.java or use `java -cp ./bin app.App` to run all the components. This will ask you the encryption type for all of the following communications, and will start the desired number of clients, repeater and server. For each client, you will be asked to enter their client ID and message ID that they are requesting. Then, the program will execute different processes to automatically generate all the needed keys for the communication. Finally, you will be able to see the message received by each client followed by a thread indicator.
 
 If you want to individually visualize the components, run the following commands at different terminals:
 
 1. Make sure that all the client, server, and repeater keys to be used are generated. If you need to create new keys, follow the instructions at the [keys generation section](#keys-generation).
-2. For running server, please use `java -cp ./bin app.server.Server type`.
-3. For running repeater, please use `java -cp ./bin app.repeater.Repeater type`.
-4. For running client, please use `java -cp ./bin app.client.Client type clientID messageID`.
+2. To run the server, please use `java -cp ./bin app.server.Server type`.
+3. To run the repeater, please use `java -cp ./bin app.repeater.Repeater type`.
+4. To run a single client, please use `java -cp ./bin app.client.Client type clientID messageID`.
 
-- Remember that you could use type `SIMETRICO` or `ASIMETRICO` according to the desired encryption type. The type must be the same for all the components in an execution.
+- Valid encryption types: `SIMETRICO` or `ASIMETRICO`. The chosen type must be the same one for all the components in an execution.
 - The clientID is an integer number.
 - The messageID is an integer number between 00 and 09.
 
 ### Keys generation
 
-When you need to generate a new key, run the following command:
+If you need to generate a new key, run the following commands:
 
 1. For symmetric encryption: `java -cp ./bin app.security.Symmetric type [id]`.
 2. For asymmetric encryption: `java -cp ./bin app.security.Asymmetric type [id]`.
