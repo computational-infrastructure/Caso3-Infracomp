@@ -96,8 +96,8 @@ public class Server {
                 OutputStream outputFromServer = socket.getOutputStream();
                 Scanner scanner = new Scanner(inputToServer, "UTF-8");
                 PrintWriter serverPrintOut = new PrintWriter(new OutputStreamWriter(outputFromServer, "UTF-8"), true);
-                serverPrintOut.println("OK");
                 String identificador = scanner.nextLine();
+                System.out.println("Se ha solicitado el mensaje con el ID encriptado " + identificador);
                 byte[] idBytes = Keys.str2byte(identificador);
                 if (tipo.equals("SIMETRICO")) {
                     byte[] decryptedID = Keys.decrypt(idBytes, llaveSimetrica);
@@ -116,6 +116,7 @@ public class Server {
                     String mensajeEncapsulado = Keys.byte2str(encryptedMessage);
                     serverPrintOut.println(mensajeEncapsulado);
                 }
+                System.out.println("Mensaje enviado exitosamente\n");
                 outputFromServer.flush();
                 scanner.close();
                 socket.close();

@@ -75,20 +75,31 @@ public class Client {
         public void run() {
             try {
                 Socket conexionRepeater = new Socket("127.0.0.1", Repeater.port);
-                requestMessageToRepeater(conexionRepeater);
-                getMessage(conexionRepeater);
+                InputStream in = conexionRepeater.getInputStream();
+                Scanner scanner = new Scanner(in, "UTF-8");
+
+                requestMessageToRepeater(conexionRepeater, scanner);
+                getMessage(conexionRepeater, scanner);
+
                 conexionRepeater.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        private void requestMessageToRepeater(Socket conexionRepeater) throws Exception {
+        private void requestMessageToRepeater(Socket conexionRepeater, Scanner scanner) throws Exception {
             OutputStream outputToRepeater = conexionRepeater.getOutputStream();
             PrintWriter clientPrintToRepeater = new PrintWriter(new OutputStreamWriter(outputToRepeater, "UTF-8"),
                     true);
             System.out.println("El Cliente " + clientID + " está solicitando el mensaje: " + messageID);
             clientPrintToRepeater.println(clientID);
+            String statusConexion = scanner.nextLine();
+            if (statusConexion.equals("OK")) {
+                System.out.println("El Cliente se ha conectado al Repetidor exitosamente");
+            } else {
+                System.out.println("El Cliente no se ha logrado conectar al Repetidor");
+                System.exit(1);
+            }
             if (tipo.equals("SIMETRICO")) {
                 byte[] encryptedMessageID = Keys.encrypt(messageID, llaveSimetrica);
                 String encapsulatedMessageID = Keys.byte2str(encryptedMessageID);
@@ -100,9 +111,7 @@ public class Client {
             }
         }
 
-        private void getMessage(Socket conexionRepeater) throws Exception {
-            InputStream in = conexionRepeater.getInputStream();
-            Scanner scanner = new Scanner(in, "UTF-8");
+        private void getMessage(Socket conexionRepeater, Scanner scanner) throws Exception {
             String message = scanner.nextLine();
             byte[] messageBytes = Keys.str2byte(message);
             if (tipo.equals("SIMETRICO")) {

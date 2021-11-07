@@ -99,12 +99,17 @@ public class Repeater {
 
         private byte[] getClientRequestID(Scanner scanner) throws Exception {
             String identificador = scanner.nextLine();
+            System.out.println("El cliente " + identificador + " está solicitando una conexión");
             int identificadorCliente = Integer.parseInt(identificador);
             byte[] encryptedID;
+            OutputStream outputToClient = socket.getOutputStream();
+            PrintWriter repeaterPrintOut = new PrintWriter(new OutputStreamWriter(outputToClient, "UTF-8"), true);
+            repeaterPrintOut.println("OK");
             if (tipo.equals("SIMETRICO")) {
                 llaveSimetricaCliente = Keys.readSecretKey(
                         "./src/app/security/keys/symmetric/clients/Client" + identificadorCliente + "Key");
                 String idMensajeString = scanner.nextLine();
+                System.out.println("El ID del mensaje requerido por el cliente ha llegado");
                 byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
                 byte[] decryptedID = Keys.decrypt(idMensajeRaw, llaveSimetricaCliente);
                 String idString = new String(decryptedID, StandardCharsets.UTF_8);
@@ -128,21 +133,20 @@ public class Repeater {
             Scanner serverScanner = new Scanner(inputToRepeaterFromServer, "UTF-8");
             PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"), true);
             String mensajeRecibido = "No se logró obtener el mensaje";
-            if (serverScanner.nextLine().equals("OK")) {
-                repeaterPrintToServer.println(encryptedIDString);
-                String mensajeEncapsulado = serverScanner.nextLine();
-                byte[] mensajeEncrypted = Keys.str2byte(mensajeEncapsulado);
-                if (tipo.equals("SIMETRICO")) {
-                    byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llaveSimetricaServidor);
-                    String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
-                    byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llaveSimetricaCliente);
-                    mensajeRecibido = Keys.byte2str(mensajeReEncrypted);
-                } else {
-                    byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llavePrivada);
-                    String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
-                    byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llavePublicaCliente);
-                    mensajeRecibido = Keys.byte2str(mensajeReEncrypted);
-                }
+            repeaterPrintToServer.println(encryptedIDString);
+            String mensajeEncapsulado = serverScanner.nextLine();
+            System.out.println("Se ha recibido el mensaje del servidor con el ID encriptado: " + encryptedIDString);
+            byte[] mensajeEncrypted = Keys.str2byte(mensajeEncapsulado);
+            if (tipo.equals("SIMETRICO")) {
+                byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llaveSimetricaServidor);
+                String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
+                byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llaveSimetricaCliente);
+                mensajeRecibido = Keys.byte2str(mensajeReEncrypted);
+            } else {
+                byte[] mensajeDecrypted = Keys.decrypt(mensajeEncrypted, llavePrivada);
+                String mensajeDecryptedString = new String(mensajeDecrypted, StandardCharsets.UTF_8);
+                byte[] mensajeReEncrypted = Keys.encrypt(mensajeDecryptedString, llavePublicaCliente);
+                mensajeRecibido = Keys.byte2str(mensajeReEncrypted);
             }
             serverScanner.close();
             conexionServer.close();
@@ -153,6 +157,7 @@ public class Repeater {
             OutputStream outputToClient = socket.getOutputStream();
             PrintWriter repeaterPrintOut = new PrintWriter(new OutputStreamWriter(outputToClient, "UTF-8"), true);
             repeaterPrintOut.println(mensajeRecibido);
+            System.out.println("Mensaje encriptado enviado al cliente: " + mensajeRecibido + "\n");
         }
     }
 }
