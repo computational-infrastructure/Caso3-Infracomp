@@ -14,6 +14,7 @@ import java.util.Scanner;
 
 import javax.crypto.SecretKey;
 
+
 import app.security.Keys;
 import app.server.Server;
 import app.utils.Termination;
@@ -24,7 +25,8 @@ public class Repeater {
     private static PrivateKey llavePrivada;
     private static PublicKey llavePublicaServidor;
     private static String tipo;
-
+    private static long avg1;
+    private static long avg2;
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: java Repeater type");
@@ -57,9 +59,11 @@ public class Repeater {
             ServerSocket serversock = new ServerSocket(port);
             current.addShutdownHook(new Termination(serversock));
             System.out.println("Repeater listening on port " + port + "...");
+            long i = 1;
             while (true) {
                 Socket socket = serversock.accept();
-                new Thread(new RepetidorDelegado(socket)).start();
+                new Thread(new RepetidorDelegado(socket, i)).start();
+                i+=1;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,24 +73,33 @@ public class Repeater {
     // Inicio del Repetidor
     public static class RepetidorDelegado implements Runnable {
         Socket socket;
+        private long repeaterID;
         private SecretKey llaveSimetricaCliente;
         private PublicKey llavePublicaCliente;
-
-        public RepetidorDelegado(Socket s) {
+        private long inst1;
+        private long inst2;
+        private long inst3;
+        private long inst4;
+        public RepetidorDelegado(Socket s, long repeaterID) 
+        {
             socket = s;
+            this.repeaterID = repeaterID;
         }
-
         public void run() {
             try {
                 InputStream inputToRepeater = socket.getInputStream();
                 Scanner scanner = new Scanner(inputToRepeater, "UTF-8");
-
                 String encryptedIDString = Keys.byte2str(getClientRequestID(scanner));
                 String message = requestMessageToServer(encryptedIDString);
                 sendMessageToClient(message);
-
                 scanner.close();
                 socket.close();
+                System.out.println("Request No: " + repeaterID + " - Tiempo de recepción de solicitud, hasta antes de envío a servidor: "+ (inst2-inst1) + " ms");
+                System.out.println("Request No: " + repeaterID + " - Tiempo de recepción de mensaje, hasta antes de envío a cliente: "+ (inst4-inst3) + " ms");
+                avg1+=inst2-inst1;
+                avg2+=inst4-inst3;
+                System.out.println("Request No: " + repeaterID + " - Promedio de ejecuciones [1]: "+ avg1/repeaterID + "ms");
+                System.out.println("Request No: " + repeaterID + " - Promedio de ejecuciones [2]: "+ avg2/repeaterID + "ms");
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
@@ -108,6 +121,7 @@ public class Repeater {
             if (tipo.equals("SIMETRICO")) {
                 llaveSimetricaCliente = Keys.readSecretKey(
                         "./src/app/security/keys/symmetric/clients/Client" + identificadorCliente + "Key");
+                inst1 = System.currentTimeMillis();
                 String idMensajeString = scanner.nextLine();
                 System.out.println("El ID del mensaje requerido por el cliente ha llegado");
                 byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
@@ -117,6 +131,7 @@ public class Repeater {
             } else {
                 llavePublicaCliente = Keys.readPublicKey(
                         "./src/app/security/keys/asymmetric/clients/Client" + identificadorCliente + "Key.pub");
+                inst1 = System.currentTimeMillis();
                 String idMensajeString = scanner.nextLine();
                 byte[] idMensajeRaw = Keys.str2byte(idMensajeString);
                 byte[] decryptedID = Keys.decrypt(idMensajeRaw, llavePrivada);
@@ -133,8 +148,10 @@ public class Repeater {
             Scanner serverScanner = new Scanner(inputToRepeaterFromServer, "UTF-8");
             PrintWriter repeaterPrintToServer = new PrintWriter(new OutputStreamWriter(outputToServer, "UTF-8"), true);
             String mensajeRecibido = "No se logró obtener el mensaje";
+            inst2 = System.currentTimeMillis();
             repeaterPrintToServer.println(encryptedIDString);
             String mensajeEncapsulado = serverScanner.nextLine();
+            inst3 = System.currentTimeMillis();
             System.out.println("Se ha recibido el mensaje del servidor con el ID encriptado: " + encryptedIDString);
             byte[] mensajeEncrypted = Keys.str2byte(mensajeEncapsulado);
             if (tipo.equals("SIMETRICO")) {
@@ -150,6 +167,7 @@ public class Repeater {
             }
             serverScanner.close();
             conexionServer.close();
+            inst4 = System.currentTimeMillis();
             return mensajeRecibido;
         }
 

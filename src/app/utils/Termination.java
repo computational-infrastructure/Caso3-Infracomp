@@ -1,20 +1,20 @@
 package app.utils;
-
-import java.io.IOException;
 import java.net.ServerSocket;
+
 
 public class Termination extends Thread {
     private static ServerSocket servSock;
 
-    public Termination(ServerSocket servSock) {
+    public Termination(ServerSocket servSock)
+    {
         Termination.servSock = servSock;
     }
 
     public void run() {
         try {
-            System.out.println("\nClosing ServerSocket on port " + servSock.getLocalPort());
+            System.out.println("Closing ServerSocket on port " + servSock.getLocalPort());
             servSock.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
