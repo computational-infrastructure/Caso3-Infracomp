@@ -22,8 +22,8 @@ public class App {
         try {
             String servidor = "java -cp ./bin app.server.Server " + tipo;
             String repetidor = "java -cp ./bin app.repeater.Repeater " + tipo;
-            //Process pS = Runtime.getRuntime().exec(servidor);
-            //Process pR = Runtime.getRuntime().exec(repetidor);
+            Process pS = Runtime.getRuntime().exec(servidor);
+            Process pR = Runtime.getRuntime().exec(repetidor);
             for (int i = 0; i < numClientes; i++) {
                 String cliente = "java -cp ./bin app.client.Client " + tipo + " ";
                 System.out.println("\nDigite el ID del cliente número " + (i + 1) + ":");
@@ -52,10 +52,10 @@ public class App {
             Proceso.barrera = new CyclicBarrier(numClientes + 1);
             new App().execute(clientes);
             Proceso.barrera.await();
-            //pS.destroy();
-            //pR.destroy();
-            //pS.waitFor();
-            //pR.waitFor();
+            pS.destroy();
+            pR.destroy();
+            pS.waitFor();
+            pR.waitFor();
             System.out.println("\n----------------");
             System.out.println("Se ha finalizado la ejecución del prototipo de comunicación");
             System.exit(0);

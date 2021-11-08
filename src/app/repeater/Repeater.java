@@ -94,8 +94,8 @@ public class Repeater {
                 sendMessageToClient(message);
                 scanner.close();
                 socket.close();
-                System.out.println("Request No: " + repeaterID + " - Tiempo de recepción de solicitud, hasta antes de envío a servidor: "+ (inst2-inst1) + " ms");
-                System.out.println("Request No: " + repeaterID + " - Tiempo de recepción de mensaje, hasta antes de envío a cliente: "+ (inst4-inst3) + " ms");
+                System.out.println("Request No: " + repeaterID + " - Tiempo de recepción de solicitud, hasta antes de envío a servidor: "+ (inst2-inst1) + " ns");
+                System.out.println("Request No: " + repeaterID + " - Tiempo de recepción de mensaje, hasta antes de envío a cliente: "+ (inst4-inst3) + " ns");
                 avg1+=inst2-inst1;
                 avg2+=inst4-inst3;
                 System.out.println("Request No: " + repeaterID + " - Promedio de ejecuciones [1]: "+ avg1/repeaterID + "ns");
